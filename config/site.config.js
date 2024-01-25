@@ -52,7 +52,7 @@ module.exports = {
   // you provide. See the documentation for details.
   links: [
     {
-      name: 'Discord,
+      name: 'Discord',
       link: 'https://discord.gg/3KaejNVu',
     },
   ],
