@@ -165,7 +165,6 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
   const { data, error, size, setSize } = useProtectedSWRInfinite(path)
 
   if (error) {
-    // If error includes 403 which means the user has not completed initial setup, redirect to OAuth page
     if (error.status === 403) {
       router.push('/onedrive-vercel-index-oauth/step-1')
       return <div />
@@ -194,13 +193,12 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
   const onlyOnePage = data && typeof data[0].next === 'undefined'
 
   if ('folder' in responses[0]) {
-    // Expand list of API returns into flattened file data
     const folderChildren = [].concat(...responses.map(r => r.folder.value)) as OdFolderObject['value']
 
-    // Filtered file list helper
+    const readmeFile = folderChildren.find(c => c.name.toLowerCase() === 'readme.md')
+
     const getFiles = () => folderChildren.filter(c => !c.folder && c.name !== '.password')
 
-    // File selection
     const genTotalSelected = (selected: { [key: string]: boolean }) => {
       const selectInfo = getFiles().map(c => Boolean(selected[c.id]))
       const [hasT, hasF] = [selectInfo.some(i => i), selectInfo.some(i => !i)]
@@ -216,24 +214,30 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
         val = { ...selected, [id]: true }
       }
       setSelected(val)
+      setTotalSelected(genTotalSelected(val))
     }
 
     const toggleTotalSelected = () => {
       if (genTotalSelected(selected) == 2) {
         setSelected({})
+        setTotalSelected(0)
       } else {
         setSelected(Object.fromEntries(getFiles().map(c => [c.id, true])))
+        setTotalSelected(2)
       }
     }
 
-    // Folder layout component props
     const folderProps = {
       toast,
       path,
       folderChildren,
       selected,
       toggleItemSelected,
+      totalSelected,
       toggleTotalSelected,
+      totalGenerating,
+      handleSelectedPermalink,
+      handleFolderDownload,
     }
 
     return (
@@ -291,7 +295,40 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
     const previewType = getPreviewType(getExtension(file.name), { video: Boolean(file.video) })
 
     if (previewType) {
-      // ... (previous code for preview types)
+      switch (previewType) {
+        case preview.image:
+          return <ImagePreview file={file} />
+
+        case preview.text:
+          return <TextPreview file={file} />
+
+        case preview.code:
+          return <CodePreview file={file} />
+
+        case preview.markdown:
+          return <MarkdownPreview file={file} path={path} />
+
+        case preview.video:
+          return <VideoPreview file={file} />
+
+        case preview.audio:
+          return <AudioPreview file={file} />
+
+        case preview.pdf:
+          return <PDFPreview file={file} />
+
+        case preview.office:
+          return <OfficePreview file={file} />
+
+        case preview.epub:
+          return <EPUBPreview file={file} />
+
+        case preview.url:
+          return <URLPreview file={file} />
+
+        default:
+          return <DefaultPreview file={file} />
+      }
     } else {
       return <DefaultPreview file={file} />
     }
