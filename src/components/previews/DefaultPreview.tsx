@@ -7,8 +7,7 @@ import { useTranslation } from 'next-i18next'
 import { getFileIcon } from '../../utils/getFileIcon'
 import { formatModifiedDateTime, humanFileSize } from '../../utils/fileDetails'
 
-import DownloadButtonGroup from '../DownloadBtnGtoup'
-import { DownloadBtnContainer, PreviewContainer } from './Containers'
+import { PreviewContainer } from './Containers'
 
 const DefaultPreview: FC<{ file: OdFileObject }> = ({ file }) => {
   const { t } = useTranslation()
@@ -72,9 +71,6 @@ const DefaultPreview: FC<{ file: OdFileObject }> = ({ file }) => {
           </div>
         </div>
       </PreviewContainer>
-      <DownloadBtnContainer>
-        <DownloadButtonGroup />
-      </DownloadBtnContainer>
     </div>
   )
 }
