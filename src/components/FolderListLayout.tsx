@@ -53,6 +53,11 @@ const FolderListLayout = ({
   // Get item path from item name
   const getItemPath = (name: string) => `${path === '/' ? '' : path}/${encodeURIComponent(name)}`
 
+  // Update the handleSelectedDownload function to prevent the download action
+  const handleSelectedDownload = () => {
+    toast.error(t('Download functionality has been disabled.'));
+  };
+
   return (
     <div className="rounded bg-white shadow-sm dark:bg-gray-900 dark:text-gray-100">
       <div className="grid grid-cols-12 items-center space-x-2 border-b border-gray-900/10 px-3 dark:border-gray-500/30">
@@ -90,6 +95,7 @@ const FolderListLayout = ({
             {totalGenerating ? (
               <Downloading title={t('Downloading selected files, refresh page to cancel')} style="p-1.5" />
             ) : (
+              // Disable or remove the download button
               <button
                 title={t('Download selected files')}
                 className="cursor-pointer rounded p-1.5 hover:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-400 disabled:hover:bg-white dark:hover:bg-gray-600 disabled:dark:text-gray-600 disabled:hover:dark:bg-gray-900"
@@ -131,6 +137,7 @@ const FolderListLayout = ({
               {folderGenerating[c.id] ? (
                 <Downloading title={t('Downloading folder, refresh page to cancel')} style="px-1.5 py-1" />
               ) : (
+                // Disable or remove the download button
                 <span
                   title={t('Download folder')}
                   className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
@@ -157,13 +164,14 @@ const FolderListLayout = ({
               >
                 <FontAwesomeIcon icon={['far', 'copy']} />
               </span>
-              <a
+              {/* Remove or disable the download button */}
+              {/* <a
                 title={t('Download file')}
                 className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                 href={`/api/raw/?path=${getItemPath(c.name)}${hashedToken ? `&odpt=${hashedToken}` : ''}`}
               >
                 <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
-              </a>
+              </a> */}
             </div>
           )}
           <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
@@ -178,7 +186,7 @@ const FolderListLayout = ({
         </div>
       ))}
     </div>
-  )
-}
+  );
+};
 
-export default FolderListLayout
+export default FolderListLayout;
