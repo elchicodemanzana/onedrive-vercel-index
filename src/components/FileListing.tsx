@@ -165,6 +165,7 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
   const { data, error, size, setSize } = useProtectedSWRInfinite(path)
 
   if (error) {
+    // If error includes 403 which means the user has not completed initial setup, redirect to OAuth page
     if (error.status === 403) {
       router.push('/onedrive-vercel-index-oauth/step-1')
       return <div />
@@ -193,12 +194,16 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
   const onlyOnePage = data && typeof data[0].next === 'undefined'
 
   if ('folder' in responses[0]) {
+    // Expand list of API returns into flattened file data
     const folderChildren = [].concat(...responses.map(r => r.folder.value)) as OdFolderObject['value']
 
+    // Find README.md file to render
     const readmeFile = folderChildren.find(c => c.name.toLowerCase() === 'readme.md')
 
+    // Filtered file list helper
     const getFiles = () => folderChildren.filter(c => !c.folder && c.name !== '.password')
 
+    // File selection
     const genTotalSelected = (selected: { [key: string]: boolean }) => {
       const selectInfo = getFiles().map(c => Boolean(selected[c.id]))
       const [hasT, hasF] = [selectInfo.some(i => i), selectInfo.some(i => !i)]
@@ -227,6 +232,70 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
       }
     }
 
+    // Selected file download
+    const handleSelectedDownload = () => {
+    }
+
+        const toastId = toast.loading(<DownloadingToast router={router} />)
+        downloadMultipleFiles({ toastId, router, files, folder })
+          .then(() => {
+            setTotalGenerating(false)
+            toast.success(t('Finished downloading selected files.'), {
+              id: toastId,
+            })
+          })
+          .catch(() => {
+            setTotalGenerating(false)
+            toast.error(t('Failed to download selected files.'), { id: toastId })
+          })
+      }
+    }
+
+    // Get selected file permalink
+    const handleSelectedPermalink = (baseUrl: string) => {
+      return getFiles()
+        .filter(c => selected[c.id])
+        .map(
+          c =>
+            `${baseUrl}/api/raw/?path=${path}/${encodeURIComponent(c.name)}${hashedToken ? `&odpt=${hashedToken}` : ''}`
+        )
+        .join('\n')
+    }
+
+    // Folder recursive download
+    const handleFolderDownload = (path: string, id: string, name?: string) => () => {
+    }
+          const hashedTokenForPath = getStoredToken(p)
+          yield {
+            name: c?.name,
+            url: `/api/raw/?path=${p}${hashedTokenForPath ? `&odpt=${hashedTokenForPath}` : ''}`,
+            path: p,
+            isFolder,
+          }
+        }
+      })()
+
+      setFolderGenerating({ ...folderGenerating, [id]: true })
+      const toastId = toast.loading(<DownloadingToast router={router} />)
+
+      downloadTreelikeMultipleFiles({
+        toastId,
+        router,
+        files,
+        basePath: path,
+        folder: name,
+      })
+        .then(() => {
+          setFolderGenerating({ ...folderGenerating, [id]: false })
+          toast.success(t('Finished downloading folder.'), { id: toastId })
+        })
+        .catch(() => {
+          setFolderGenerating({ ...folderGenerating, [id]: false })
+          toast.error(t('Failed to download folder.'), { id: toastId })
+        })
+    }
+
+    // Folder layout component props
     const folderProps = {
       toast,
       path,
@@ -236,6 +305,8 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
       totalSelected,
       toggleTotalSelected,
       totalGenerating,
+      handleSelectedDownload,
+      folderGenerating,
       handleSelectedPermalink,
       handleFolderDownload,
     }
