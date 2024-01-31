@@ -2,6 +2,7 @@ import type { OdFileObject, OdFolderChildren, OdFolderObject } from '../types'
 import { ParsedUrlQuery } from 'querystring'
 import { FC, MouseEventHandler, SetStateAction, useEffect, useRef, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Toaster } from 'react-hot-toast'; // Added import for Toaster
 import emojiRegex from 'emoji-regex'
 
 import dynamic from 'next/dynamic'
@@ -204,6 +205,7 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
 
     return (
       <>
+        {/* Place the Toaster component at the beginning of your component */}
         <Toaster />
 
         {layout.name === 'Grid' ? <FolderGridLayout {...folderProps} /> : <FolderListLayout {...folderProps} />}
