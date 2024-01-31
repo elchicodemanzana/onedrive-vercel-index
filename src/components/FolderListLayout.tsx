@@ -69,9 +69,6 @@ const FolderListLayout = ({
         <div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
           {t('Size')}
         </div>
-        <div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
-          {t('Actions')}
-        </div>
       </div>
 
       {folderChildren.map((c: OdFolderChildren) => (
