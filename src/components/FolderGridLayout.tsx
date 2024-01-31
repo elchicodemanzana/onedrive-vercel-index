@@ -8,23 +8,18 @@ import { useTranslation } from 'next-i18next'
 
 import { getBaseUrl } from '../utils/getBaseUrl'
 import { formatModifiedDateTime } from '../utils/fileDetails'
-import { Checkbox, ChildIcon, ChildName, Downloading } from './FileListing'
-import { getStoredToken } from '../utils/protectedRouteHandler'
 
 const GridItem = ({ c, path }: { c: OdFolderChildren; path: string }) => {
-  // We use the generated medium thumbnail for rendering preview images (excluding folders)
   const hashedToken = getStoredToken(path)
   const thumbnailUrl =
     'folder' in c ? null : `/api/thumbnail/?path=${path}&size=medium${hashedToken ? `&odpt=${hashedToken}` : ''}`
 
-  // Some thumbnails are broken, so we check for onerror event in the image component
   const [brokenThumbnail, setBrokenThumbnail] = useState(false)
 
   return (
     <div className="space-y-2">
       <div className="h-32 overflow-hidden rounded border border-gray-900/10 dark:border-gray-500/30">
         {thumbnailUrl && !brokenThumbnail ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             className="h-full w-full object-cover object-top"
             src={thumbnailUrl}
@@ -69,11 +64,9 @@ const FolderGridLayout = ({
   toast,
 }) => {
   const clipboard = useClipboard()
-  const hashedToken = getStoredToken(path)
 
   const { t } = useTranslation()
 
-  // Get item path from item name
   const getItemPath = (name: string) => `${path === '/' ? '' : path}/${encodeURIComponent(name)}`
 
   return (
@@ -99,7 +92,9 @@ const FolderGridLayout = ({
             <FontAwesomeIcon icon={['far', 'copy']} size="lg" />
           </button>
           {totalGenerating ? (
-            <Downloading title={t('Downloading selected files, refresh page to cancel')} style="p-1.5" />
+            <span title={t('Downloading selected files, refresh page to cancel')} className="p-1.5">
+              <LoadingIcon className="inline-block h-4 w-4 animate-spin" />
+            </span>
           ) : (
             <button
               title={t('Download selected files')}
@@ -133,12 +128,14 @@ const FolderGridLayout = ({
                     <FontAwesomeIcon icon={['far', 'copy']} />
                   </span>
                   {folderGenerating[c.id] ? (
-                    <Downloading title={t('Downloading folder, refresh page to cancel')} style="px-1.5 py-1" />
+                    <span title={t('Downloading folder, refresh page to cancel')} className="px-1.5 py-1">
+                      <LoadingIcon className="inline-block h-4 w-4 animate-spin" />
+                    </span>
                   ) : (
                     <span
                       title={t('Download folder')}
                       className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
-                      onClick={handleFolderDownload(getItemPath(c.name), c.id, c.name)}
+                      onClick={() => handleFolderDownload(getItemPath(c.name), c.id, c.name)}
                     >
                       <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
                     </span>
@@ -197,4 +194,4 @@ const FolderGridLayout = ({
   )
 }
 
-export default FolderGridLayout
+export default FolderGridLayout;
