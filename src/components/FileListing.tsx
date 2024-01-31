@@ -14,12 +14,6 @@ import { getPreviewType, preview } from '../utils/getPreviewType'
 import { useProtectedSWRInfinite } from '../utils/fetchWithSWR'
 import { getExtension, getRawExtension, getFileIcon } from '../utils/getFileIcon'
 import { getStoredToken } from '../utils/protectedRouteHandler'
-import {
-  DownloadingToast,
-  downloadMultipleFiles,
-  downloadTreelikeMultipleFiles,
-  traverseFolder,
-} from './MultiFileDownloader'
 
 import { layouts } from './SwitchLayout'
 import Loading, { LoadingIcon } from './Loading'
@@ -233,23 +227,7 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
     }
 
     // Selected file download
-    const handleSelectedDownload = () => {
-    }
-
-        const toastId = toast.loading(<DownloadingToast router={router} />)
-        downloadMultipleFiles({ toastId, router, files, folder })
-          .then(() => {
-            setTotalGenerating(false)
-            toast.success(t('Finished downloading selected files.'), {
-              id: toastId,
-            })
-          })
-          .catch(() => {
-            setTotalGenerating(false)
-            toast.error(t('Failed to download selected files.'), { id: toastId })
-          })
-      }
-    }
+    // Puste ciało funkcji, aby uniemożliwić pobieranie
 
     // Get selected file permalink
     const handleSelectedPermalink = (baseUrl: string) => {
@@ -263,37 +241,7 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
     }
 
     // Folder recursive download
-    const handleFolderDownload = (path: string, id: string, name?: string) => () => {
-    }
-          const hashedTokenForPath = getStoredToken(p)
-          yield {
-            name: c?.name,
-            url: `/api/raw/?path=${p}${hashedTokenForPath ? `&odpt=${hashedTokenForPath}` : ''}`,
-            path: p,
-            isFolder,
-          }
-        }
-      })()
-
-      setFolderGenerating({ ...folderGenerating, [id]: true })
-      const toastId = toast.loading(<DownloadingToast router={router} />)
-
-      downloadTreelikeMultipleFiles({
-        toastId,
-        router,
-        files,
-        basePath: path,
-        folder: name,
-      })
-        .then(() => {
-          setFolderGenerating({ ...folderGenerating, [id]: false })
-          toast.success(t('Finished downloading folder.'), { id: toastId })
-        })
-        .catch(() => {
-          setFolderGenerating({ ...folderGenerating, [id]: false })
-          toast.error(t('Failed to download folder.'), { id: toastId })
-        })
-    }
+    // Puste ciało funkcji, aby uniemożliwić pobieranie
 
     // Folder layout component props
     const folderProps = {
@@ -305,10 +253,10 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
       totalSelected,
       toggleTotalSelected,
       totalGenerating,
-      handleSelectedDownload,
+      handleSelectedDownload: () => {}, // Puste ciało funkcji, aby uniemożliwić pobieranie
       folderGenerating,
       handleSelectedPermalink,
-      handleFolderDownload,
+      handleFolderDownload: () => {}, // Puste ciało funkcji, aby uniemożliwić pobieranie
     }
 
     return (
@@ -411,4 +359,4 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
     </PreviewContainer>
   )
 }
-export default FileListing
+export default FileListing;
