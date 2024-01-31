@@ -253,7 +253,7 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
       } else if (files.length > 1) {
         setTotalGenerating(true)
 
-        const toastId = toast.loading(<DownloadingToast router={router} />)
+        const toastObj = toast.loading(<DownloadingToast router={router} />) const toastId = toastObj.id;
         downloadMultipleFiles({ toastId, router, files, folder })
           .then(() => {
             setTotalGenerating(false)
