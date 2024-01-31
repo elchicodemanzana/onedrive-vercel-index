@@ -41,8 +41,9 @@ const FolderListLayout = ({
   totalGenerating,
   handleFolderDownload,
   toast,
-  folderGenerating, // Dodaj deklarację folderGenerating
+  folderGenerating,
 }) => {
+  const router = useRouter(); // Dodaj router
   const clipboard = useClipboard();
   const hashedToken = getStoredToken(path);
 
@@ -79,7 +80,12 @@ const FolderListLayout = ({
           key={c.id}
         >
           <div className="col-span-12 md:col-span-10">
-            <FileListItem fileContent={c} />
+            {/* Dodaj obsługę nawigacji za pomocą komponentu Link */}
+            <Link href={`${path === '/' ? '' : path}/${encodeURIComponent(c.name)}`} passHref>
+              <a>
+                <FileListItem fileContent={c} />
+              </a>
+            </Link>
           </div>
 
           {c.folder ? (
