@@ -39,9 +39,8 @@ const FolderListLayout = ({
   totalSelected,
   toggleTotalSelected,
   totalGenerating,
-  handleSelectedDownload,
-  folderGenerating,
   handleSelectedPermalink,
+  folderGenerating,
   handleFolderDownload,
   toast,
 }) => {
@@ -53,7 +52,7 @@ const FolderListLayout = ({
   // Get item path from item name
   const getItemPath = (name: string) => `${path === '/' ? '' : path}/${encodeURIComponent(name)}`
 
-  // Update the handleSelectedDownload function to prevent the download action
+  // Disable or remove the download button
   const handleSelectedDownload = () => {
     toast.error(t('Download functionality has been disabled.'));
   };
@@ -164,14 +163,7 @@ const FolderListLayout = ({
               >
                 <FontAwesomeIcon icon={['far', 'copy']} />
               </span>
-              {/* Remove or disable the download button */}
-              {/* <a
-                title={t('Download file')}
-                className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
-                href={`/api/raw/?path=${getItemPath(c.name)}${hashedToken ? `&odpt=${hashedToken}` : ''}`}
-              >
-                <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
-              </a> */}
+              {/* Remove the download button for individual files */}
             </div>
           )}
           <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
@@ -186,7 +178,7 @@ const FolderListLayout = ({
         </div>
       ))}
     </div>
-  );
-};
+  )
+}
 
 export default FolderListLayout;
