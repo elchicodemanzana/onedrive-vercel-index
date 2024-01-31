@@ -111,18 +111,7 @@ const FolderListLayout = ({
             </div>
           ) : (
             <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
-              <span
-                title={t('Copy raw file permalink')}
-                className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
-                onClick={() => {
-                  clipboard.copy(
-                    `${getBaseUrl()}/api/raw/?path=${getItemPath(c.name)}${hashedToken ? `&odpt=${hashedToken}` : ''}`
-                  );
-                  toast.success(t('Copied raw file permalink.'));
-                }}
-              >
-                <FontAwesomeIcon icon={['far', 'copy']} />
-              </span>
+              {/* Remove the permalink button for individual files */}
               {/* Remove the download button for individual files */}
             </div>
           )}
