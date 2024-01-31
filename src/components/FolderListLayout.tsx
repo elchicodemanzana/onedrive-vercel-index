@@ -41,6 +41,7 @@ const FolderListLayout = ({
   totalGenerating,
   handleFolderDownload,
   toast,
+  folderGenerating, // Dodaj deklarację folderGenerating
 }) => {
   const clipboard = useClipboard();
   const hashedToken = getStoredToken(path);
