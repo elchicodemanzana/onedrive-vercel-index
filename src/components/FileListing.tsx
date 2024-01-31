@@ -1,8 +1,7 @@
 import type { OdFileObject, OdFolderChildren, OdFolderObject } from '../types'
 import { ParsedUrlQuery } from 'querystring'
-import { FC, MouseEventHandler, SetStateAction, useEffect, useRef, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import toast, { Toaster } from 'react-hot-toast'
 import emojiRegex from 'emoji-regex'
 
 import dynamic from 'next/dynamic'
@@ -14,12 +13,6 @@ import { getPreviewType, preview } from '../utils/getPreviewType'
 import { useProtectedSWRInfinite } from '../utils/fetchWithSWR'
 import { getExtension, getRawExtension, getFileIcon } from '../utils/getFileIcon'
 import { getStoredToken } from '../utils/protectedRouteHandler'
-import {
-  DownloadingToast,
-  downloadMultipleFiles,
-  downloadTreelikeMultipleFiles,
-  traverseFolder,
-} from './MultiFileDownloader'
 
 import { layouts } from './SwitchLayout'
 import Loading, { LoadingIcon } from './Loading'
@@ -106,13 +99,9 @@ export const Checkbox: FC<{
     }
   }, [ref, checked, indeterminate])
 
-  const handleClick: MouseEventHandler = e => {
+  const handleClick = () => {
     if (ref.current) {
-      if (e.target === ref.current) {
-        e.stopPropagation()
-      } else {
-        ref.current.click()
-      }
+      ref.current.click();
     }
   }
 
@@ -134,6 +123,17 @@ export const Checkbox: FC<{
   )
 }
 
+export const Downloading: FC<{ title: string; style: string }> = ({ title, style }) => {
+  return (
+    <span title={title} className={`${style} rounded`} role="status">
+      <LoadingIcon
+        // Use fontawesome far theme via class `svg-inline--fa` to get style `vertical-align` only
+        // for consistent icon alignment, as class `align-*` cannot satisfy it
+        className="svg-inline--fa inline-block h-4 w-4 animate-spin"
+      />
+    </span>
+  )
+}
 
 const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
   const [selected, setSelected] = useState<{ [key: string]: boolean }>({})
