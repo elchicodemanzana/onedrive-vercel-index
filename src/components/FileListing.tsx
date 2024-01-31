@@ -134,17 +134,6 @@ export const Checkbox: FC<{
   )
 }
 
-export const Downloading: FC<{ title: string; style: string }> = ({ title, style }) => {
-  return (
-    <span title={title} className={`${style} rounded`} role="status">
-      <LoadingIcon
-        // Use fontawesome far theme via class `svg-inline--fa` to get style `vertical-align` only
-        // for consistent icon alignment, as class `align-*` cannot satisfy it
-        className="svg-inline--fa inline-block h-4 w-4 animate-spin"
-      />
-    </span>
-  )
-}
 
 const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
   const [selected, setSelected] = useState<{ [key: string]: boolean }>({})
