@@ -10,8 +10,7 @@ import useFileContent from '../../utils/fetchOnMount'
 import { getLanguageByFileName } from '../../utils/getPreviewType'
 import FourOhFour from '../FourOhFour'
 import Loading from '../Loading'
-import DownloadButtonGroup from '../DownloadBtnGtoup'
-import { DownloadBtnContainer, PreviewContainer } from './Containers'
+import { PreviewContainer } from './Containers'
 
 const CodePreview: FC<{ file: any }> = ({ file }) => {
   const { asPath } = useRouter()
@@ -33,9 +32,6 @@ const CodePreview: FC<{ file: any }> = ({ file }) => {
         <PreviewContainer>
           <Loading loadingText={t('Loading file content...')} />
         </PreviewContainer>
-        <DownloadBtnContainer>
-          <DownloadButtonGroup />
-        </DownloadBtnContainer>
       </>
     )
   }
@@ -50,9 +46,6 @@ const CodePreview: FC<{ file: any }> = ({ file }) => {
           {content}
         </SyntaxHighlighter>
       </PreviewContainer>
-      <DownloadBtnContainer>
-        <DownloadButtonGroup />
-      </DownloadBtnContainer>
     </>
   )
 }
