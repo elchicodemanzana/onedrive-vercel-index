@@ -9,7 +9,7 @@ import { useTranslation } from 'next-i18next'
 import { getBaseUrl } from '../utils/getBaseUrl'
 import { humanFileSize, formatModifiedDateTime } from '../utils/fileDetails'
 
-import { Downloading, Checkbox, ChildIcon, ChildName } from './FileListing'
+import { Downloading, ChildIcon, ChildName } from './FileListing'  // Usuń zbędne importy
 import { getStoredToken } from '../utils/protectedRouteHandler'
 
 const FileListItem: FC<{ fileContent: OdFolderChildren }> = ({ fileContent: c }) => {
@@ -39,7 +39,6 @@ const FolderListLayout = ({
   totalSelected,
   toggleTotalSelected,
   totalGenerating,
-  handleFolderDownload,
   toast,
   folderGenerating,
 }) => {
@@ -51,11 +50,6 @@ const FolderListLayout = ({
 
   // Get item path from item name
   const getItemPath = (name: string) => `${path === '/' ? '' : path}/${encodeURIComponent(name)}`;
-
-  // Disable or remove the download button
-  const handleSelectedDownload = () => {
-    toast.error(t('Download functionality has been disabled.'));
-  };
 
   return (
     <div className="rounded bg-white shadow-sm dark:bg-gray-900 dark:text-gray-100">
@@ -100,23 +94,14 @@ const FolderListLayout = ({
               {folderGenerating[c.id] ? (
                 <Downloading title={t('Downloading folder, refresh page to cancel')} style="px-1.5 py-1" />
               ) : (
-                // Disable or remove the download button
-                <span
-                  title={t('Download folder')}
-                  className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
-                  onClick={() => {
-                    const p = `${path === '/' ? '' : path}/${encodeURIComponent(c.name)}`;
-                    handleFolderDownload(p, c.id, c.name)();
-                  }}
-                >
-                  <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
-                </span>
+                <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
+                  {/* Remove the permalink button for individual files */}
+                </div>
               )}
             </div>
           ) : (
             <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
               {/* Remove the permalink button for individual files */}
-              {/* Remove the download button for individual files */}
             </div>
           )}
         </div>
