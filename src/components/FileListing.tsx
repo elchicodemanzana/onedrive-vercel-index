@@ -2,11 +2,13 @@ import type { OdFileObject, OdFolderChildren, OdFolderObject } from '../types'
 import { ParsedUrlQuery } from 'querystring'
 import { FC, MouseEventHandler, SetStateAction, useEffect, useRef, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Toaster, useToaster } from 'react-hot-toast'; // Added import for Toaster and useToaster
+import { Toaster, useToaster } from 'react-hot-toast'
 import emojiRegex from 'emoji-regex'
+
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
+
 import useLocalStorage from '../utils/useLocalStorage'
 import { getPreviewType, preview } from '../utils/getPreviewType'
 import { useProtectedSWRInfinite } from '../utils/fetchWithSWR'
@@ -18,6 +20,7 @@ import {
   downloadTreelikeMultipleFiles,
   traverseFolder,
 } from './MultiFileDownloader'
+
 import { layouts } from './SwitchLayout'
 import Loading, { LoadingIcon } from './Loading'
 import FourOhFour from './FourOhFour'
@@ -33,6 +36,7 @@ import URLPreview from './previews/URLPreview'
 import ImagePreview from './previews/ImagePreview'
 import DefaultPreview from './previews/DefaultPreview'
 import { PreviewContainer } from './previews/Containers'
+
 import FolderListLayout from './FolderListLayout'
 import FolderGridLayout from './FolderGridLayout'
 
@@ -62,12 +66,10 @@ const renderEmoji = (name: string) => {
   const emoji = emojiRegex().exec(name)
   return { render: emoji && !emoji.index, emoji }
 }
-
 const formatChildName = (name: string) => {
   const { render, emoji } = renderEmoji(name)
   return render ? name.replace(emoji ? emoji[0] : '', '').trim() : name
 }
-
 export const ChildName: FC<{ name: string; folder?: boolean }> = ({ name, folder }) => {
   const original = formatChildName(name)
   const extension = folder ? '' : getRawExtension(original)
@@ -78,7 +80,6 @@ export const ChildName: FC<{ name: string; folder?: boolean }> = ({ name, folder
     </span>
   )
 }
-
 export const ChildIcon: FC<{ child: OdFolderChildren }> = ({ child }) => {
   const { render, emoji } = renderEmoji(child.name)
   return render ? (
@@ -137,6 +138,8 @@ export const Downloading: FC<{ title: string; style: string }> = ({ title, style
   return (
     <span title={title} className={`${style} rounded`} role="status">
       <LoadingIcon
+        // Use fontawesome far theme via class `svg-inline--fa` to get style `vertical-align` only
+        // for consistent icon alignment, as class `align-*` cannot satisfy it
         className="svg-inline--fa inline-block h-4 w-4 animate-spin"
       />
     </span>
@@ -154,15 +157,13 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
   const router = useRouter()
   const hashedToken = getStoredToken(router.asPath)
   const [layout, _] = useLocalStorage('preferredLayout', layouts[0])
+  const { toasts, handlers: toastHandlers } = useToaster();
 
   const { t } = useTranslation()
 
   const path = queryToPath(query)
 
   const { data, error, size, setSize } = useProtectedSWRInfinite(path)
-
-  // Use useToaster hook to get the toast function
-  const toast = useToaster();
 
   if (error) {
     // If error includes 403 which means the user has not completed initial setup, redirect to OAuth page
@@ -253,16 +254,20 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
       } else if (files.length > 1) {
         setTotalGenerating(true)
 
-        const toastObj = toast.loading(<DownloadingToast router={router} />) const toastId = toastObj.id;
+        const toastObj = toastHandlers.startPause();
+        const toastId = toastObj.id;
+
         downloadMultipleFiles({ toastId, router, files, folder })
           .then(() => {
             setTotalGenerating(false)
+            toastHandlers.endPause(toastId);
             toast.success(t('Finished downloading selected files.'), {
               id: toastId,
             })
           })
           .catch(() => {
             setTotalGenerating(false)
+            toastHandlers.endPause(toastId);
             toast.error(t('Failed to download selected files.'), { id: toastId })
           })
       }
@@ -304,7 +309,9 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
       })()
 
       setFolderGenerating({ ...folderGenerating, [id]: true })
-      const toastId = toast.loading(<DownloadingToast router={router} />)
+
+      const toastObj = toastHandlers.startPause();
+      const toastId = toastObj.id;
 
       downloadTreelikeMultipleFiles({
         toastId,
@@ -315,17 +322,19 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
       })
         .then(() => {
           setFolderGenerating({ ...folderGenerating, [id]: false })
+          toastHandlers.endPause(toastId);
           toast.success(t('Finished downloading folder.'), { id: toastId })
         })
         .catch(() => {
           setFolderGenerating({ ...folderGenerating, [id]: false })
+          toastHandlers.endPause(toastId);
           toast.error(t('Failed to download folder.'), { id: toastId })
         })
     }
 
     // Folder layout component props
     const folderProps = {
-      toast,
+      toastHandlers,
       path,
       folderChildren,
       selected,
@@ -341,7 +350,6 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
 
     return (
       <>
-        {/* Place the Toaster component at the beginning of your component */}
         <Toaster />
 
         {layout.name === 'Grid' ? <FolderGridLayout {...folderProps} /> : <FolderListLayout {...folderProps} />}
@@ -440,4 +448,5 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
     </PreviewContainer>
   )
 }
+
 export default FileListing;
