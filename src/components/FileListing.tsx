@@ -2,7 +2,7 @@ import type { OdFileObject, OdFolderChildren, OdFolderObject } from '../types'
 import { ParsedUrlQuery } from 'querystring'
 import { FC, MouseEventHandler, SetStateAction, useEffect, useRef, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Toaster, useToaster } from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 import emojiRegex from 'emoji-regex'
 
 import dynamic from 'next/dynamic'
@@ -157,7 +157,6 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
   const router = useRouter()
   const hashedToken = getStoredToken(router.asPath)
   const [layout, _] = useLocalStorage('preferredLayout', layouts[0])
-  const { toasts, handlers: toastHandlers } = useToaster();
 
   const { t } = useTranslation()
 
@@ -254,20 +253,16 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
       } else if (files.length > 1) {
         setTotalGenerating(true)
 
-        const toastObj = toastHandlers.startPause();
-        const toastId = toastObj.id;
-
+        const toastId = toast.loading(<DownloadingToast router={router} />)
         downloadMultipleFiles({ toastId, router, files, folder })
           .then(() => {
             setTotalGenerating(false)
-            toastHandlers.endPause(toastId);
             toast.success(t('Finished downloading selected files.'), {
               id: toastId,
             })
           })
           .catch(() => {
             setTotalGenerating(false)
-            toastHandlers.endPause(toastId);
             toast.error(t('Failed to download selected files.'), { id: toastId })
           })
       }
@@ -309,9 +304,7 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
       })()
 
       setFolderGenerating({ ...folderGenerating, [id]: true })
-
-      const toastObj = toastHandlers.startPause();
-      const toastId = toastObj.id;
+      const toastId = toast.loading(<DownloadingToast router={router} />)
 
       downloadTreelikeMultipleFiles({
         toastId,
@@ -322,19 +315,17 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
       })
         .then(() => {
           setFolderGenerating({ ...folderGenerating, [id]: false })
-          toastHandlers.endPause(toastId);
           toast.success(t('Finished downloading folder.'), { id: toastId })
         })
         .catch(() => {
           setFolderGenerating({ ...folderGenerating, [id]: false })
-          toastHandlers.endPause(toastId);
           toast.error(t('Failed to download folder.'), { id: toastId })
         })
     }
 
     // Folder layout component props
     const folderProps = {
-      toastHandlers,
+      toast,
       path,
       folderChildren,
       selected,
@@ -448,5 +439,4 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
     </PreviewContainer>
   )
 }
-
-export default FileListing;
+export default FileListing
