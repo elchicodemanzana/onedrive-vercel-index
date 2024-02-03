@@ -39,21 +39,17 @@ const FolderListLayout = ({
   totalSelected,
   toggleTotalSelected,
   totalGenerating,
-  handleFolderDownload,
   toast,
   folderGenerating,
 }) => {
-  const router = useRouter();
+  const router = useRouter(); // Dodaj router
   const clipboard = useClipboard();
   const hashedToken = getStoredToken(path);
 
   const { t } = useTranslation();
 
+  // Get item path from item name
   const getItemPath = (name: string) => `${path === '/' ? '' : path}/${encodeURIComponent(name)}`;
-
-  const handleSelectedDownload = () => {
-    toast.error(t('Download functionality has been disabled.'));
-  };
 
   return (
     <div className="rounded bg-white shadow-sm dark:bg-gray-900 dark:text-gray-100">
@@ -75,6 +71,7 @@ const FolderListLayout = ({
           key={c.id}
         >
           <div className="col-span-12 md:col-span-10">
+            {/* Dodaj obsługę nawigacji za pomocą komponentu Link */}
             <Link href={`${path === '/' ? '' : path}/${encodeURIComponent(c.name)}`} passHref>
               <a>
                 <FileListItem fileContent={c} />
@@ -97,27 +94,20 @@ const FolderListLayout = ({
               {folderGenerating[c.id] ? (
                 <Downloading title={t('Downloading folder, refresh page to cancel')} style="px-1.5 py-1" />
               ) : (
-                <span
-                  title={t('Download folder')}
-                  className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
-                  onClick={() => {
-                    const p = `${path === '/' ? '' : path}/${encodeURIComponent(c.name)}`;
-                    handleFolderDownload(p, c.id, c.name)();
-                  }}
-                >
-                  <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
-                </span>
+                <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
+                  {/* Remove the permalink button for individual files */}
+                </div>
               )}
             </div>
           ) : (
             <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
-              {/* Usuń zbędne elementy */}
+              {/* Remove the permalink button for individual files */}
             </div>
           )}
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 export default FolderListLayout;
